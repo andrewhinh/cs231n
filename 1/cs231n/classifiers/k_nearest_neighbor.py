@@ -1,11 +1,10 @@
-from builtins import range
-from builtins import object
+from builtins import object, range
+
 import numpy as np
-from past.builtins import xrange
 
 
 class KNearestNeighbor(object):
-    """ a kNN classifier with L2 distance """
+    """a kNN classifier with L2 distance"""
 
     def __init__(self):
         pass
@@ -77,7 +76,7 @@ class KNearestNeighbor(object):
                 #####################################################################
                 # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 
-                pass
+                dists[i, j] = np.sqrt(np.sum((X[i, :] - self.X_train[j, :]) ** 2))
 
                 # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
         return dists
@@ -101,7 +100,7 @@ class KNearestNeighbor(object):
             #######################################################################
             # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 
-            pass
+            dists[i, :] = np.sqrt(np.sum((X[i, :] - self.X_train) ** 2, axis=1))
 
             # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
         return dists
@@ -131,7 +130,14 @@ class KNearestNeighbor(object):
         #########################################################################
         # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 
-        pass
+        # (X-self.X_train)**2 = X**2 - 2*X*self.X_train + self.X_train**2
+        # print(X.shape, self.X_train.shape)
+        # print((X**2).shape, (self.X_train**2).shape)
+        dists = np.sqrt(
+            -2 * X.dot(self.X_train.T)
+            + (X**2).sum(axis=1, keepdims=True)
+            + (self.X_train**2).sum(axis=1, keepdims=True).T
+        )
 
         # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
         return dists
@@ -164,7 +170,8 @@ class KNearestNeighbor(object):
             #########################################################################
             # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 
-            pass
+            ind = dists.argsort(axis=1)[i, :k]
+            closest_y = self.y_train[ind]
 
             # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
             #########################################################################
@@ -175,8 +182,9 @@ class KNearestNeighbor(object):
             # label.                                                                #
             #########################################################################
             # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
+            import statistics as st
 
-            pass
+            y_pred[i] = st.mode(list(closest_y))
 
             # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 

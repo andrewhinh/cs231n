@@ -1,11 +1,11 @@
 from __future__ import print_function
 
-from builtins import range
-from builtins import object
+from builtins import object, range
+
 import numpy as np
+
 from ..classifiers.linear_svm import *
 from ..classifiers.softmax import *
-from past.builtins import xrange
 
 
 class LinearClassifier(object):
@@ -66,7 +66,9 @@ class LinearClassifier(object):
             #########################################################################
             # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 
-            pass
+            idxs = np.random.choice(num_train, batch_size)
+            X_batch = X[idxs]
+            y_batch = y[idxs]
 
             # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 
@@ -81,7 +83,7 @@ class LinearClassifier(object):
             #########################################################################
             # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 
-            pass
+            self.W -= learning_rate * grad
 
             # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 
@@ -111,7 +113,7 @@ class LinearClassifier(object):
         ###########################################################################
         # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 
-        pass
+        y_pred = X.dot(self.W).argmax(axis=1)
 
         # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
         return y_pred
@@ -135,14 +137,14 @@ class LinearClassifier(object):
 
 
 class LinearSVM(LinearClassifier):
-    """ A subclass that uses the Multiclass SVM loss function """
+    """A subclass that uses the Multiclass SVM loss function"""
 
     def loss(self, X_batch, y_batch, reg):
         return svm_loss_vectorized(self.W, X_batch, y_batch, reg)
 
 
 class Softmax(LinearClassifier):
-    """ A subclass that uses the Softmax + Cross-entropy loss function """
+    """A subclass that uses the Softmax + Cross-entropy loss function"""
 
     def loss(self, X_batch, y_batch, reg):
         return softmax_loss_vectorized(self.W, X_batch, y_batch, reg)

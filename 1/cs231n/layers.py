@@ -1,6 +1,4 @@
-from builtins import range
 import numpy as np
-
 
 
 def affine_forward(x, w, b):
@@ -28,7 +26,9 @@ def affine_forward(x, w, b):
     ###########################################################################
     # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 
-    pass
+    N = x.shape[0]
+    inp = x.reshape(N, -1)
+    out = inp.dot(w) + b
 
     # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
     ###########################################################################
@@ -61,7 +61,9 @@ def affine_backward(dout, cache):
     ###########################################################################
     # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 
-    pass
+    dx = (dout @ w.T).reshape(x.shape)
+    dw = (x.reshape(x.shape[0], -1).T @ dout).reshape(w.shape)
+    db = np.sum(dout, axis=0)
 
     # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
     ###########################################################################
@@ -87,7 +89,7 @@ def relu_forward(x):
     ###########################################################################
     # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 
-    pass
+    out = np.where(x > 0, x, 0)
 
     # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
     ###########################################################################
@@ -114,7 +116,7 @@ def relu_backward(dout, cache):
     ###########################################################################
     # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 
-    pass
+    dx = dout * (x > 0)
 
     # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
     ###########################################################################
@@ -773,7 +775,24 @@ def svm_loss(x, y):
     ###########################################################################
     # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 
-    pass
+    # compute the loss and the gradient
+    num_train = x.shape[0]
+    loss = 0.0
+
+    correct_class_scores = x[np.arange(num_train), y].reshape(-1, 1)
+    margins = np.maximum(0, x - correct_class_scores + 1)
+    margins[np.arange(num_train), y] = 0
+    loss = np.sum(margins)
+
+    binary = np.zeros(margins.shape)
+    binary[margins > 0] = 1
+    binary[np.arange(num_train), y] = -np.sum(binary, axis=1)
+    dx = binary
+
+    # Right now the loss is a sum over all training examples, but we want it
+    # to be an average instead so we divide by num_train.
+    loss /= num_train
+    dx /= num_train
 
     # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
     ###########################################################################
@@ -803,7 +822,19 @@ def softmax_loss(x, y):
     ###########################################################################
     # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 
-    pass
+    n = x.shape[0]
+
+    exp_scores = np.exp(x)
+    prob_scores = exp_scores / np.sum(exp_scores, axis=1, keepdims=True)
+    correct_log_probs = -np.log(prob_scores[range(n), y])
+    loss = np.sum(correct_log_probs)
+
+    dscores = prob_scores
+    dscores[range(n), y] -= 1
+    dx = dscores
+
+    loss /= n
+    dx /= n
 
     # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
     ###########################################################################

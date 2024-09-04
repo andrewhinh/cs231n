@@ -1,9 +1,9 @@
-from builtins import range
 from builtins import object
+
 import numpy as np
 
-from ..layers import *
 from ..layer_utils import *
+from ..layers import *
 
 
 class TwoLayerNet(object):
@@ -55,7 +55,21 @@ class TwoLayerNet(object):
         ############################################################################
         # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 
-        pass
+        self.W1 = np.random.normal(0, weight_scale, input_dim * hidden_dim).reshape(
+            input_dim, hidden_dim
+        )
+        self.b1 = np.zeros(hidden_dim)
+        self.W2 = np.random.normal(0, weight_scale, hidden_dim * num_classes).reshape(
+            hidden_dim, num_classes
+        )
+        self.b2 = np.zeros(num_classes)
+
+        self.params = {
+            "W1": self.W1,
+            "b1": self.b1,
+            "W2": self.W2,
+            "b2": self.b2,
+        }
 
         # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
         ############################################################################
@@ -88,7 +102,14 @@ class TwoLayerNet(object):
         ############################################################################
         # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 
-        pass
+        W1, b1, W2, b2 = (
+            self.params["W1"],
+            self.params["b1"],
+            self.params["W2"],
+            self.params["b2"],
+        )
+        out, fc1relu_cache = affine_relu_forward(X, W1, b1)
+        scores, fc2_cache = affine_forward(out, W2, b2)
 
         # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
         ############################################################################
@@ -112,7 +133,21 @@ class TwoLayerNet(object):
         ############################################################################
         # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 
-        pass
+        loss, dout = softmax_loss(scores, y)
+        loss += 0.5 * self.reg * (np.sum(W1**2) + np.sum(W2**2))
+
+        dout, dw2, db2 = affine_backward(dout, fc2_cache)
+        dout, dw1, db1 = affine_relu_backward(dout, fc1relu_cache)
+
+        dw2 += self.reg * W2
+        dw1 += self.reg * W1
+
+        grads = {
+            "W1": dw1,
+            "b1": db1,
+            "W2": dw2,
+            "b2": db2,
+        }
 
         # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
         ############################################################################
